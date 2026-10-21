@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DKV Class Manager</title>
+<style>
+:root{--p:#6558e8;--bg:#f5f6fb;--ink:#252640;--muted:#777b91;--line:#e8e9f2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+header{background:white;border-bottom:1px solid var(--line);padding:18px 22px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:19px;font-weight:900}.logo span{color:var(--p)}
+.logo small{display:block;font-size:10px;letter-spacing:2px;color:var(--muted);margin-top:5px}
+.badge{background:#efedff;color:var(--p);padding:10px 13px;border-radius:10px;font-size:12px;font-weight:bold}
+.layout{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 70px)}
+aside{background:white;border-right:1px solid var(--line);padding:20px 12px}
+.nav{width:100%;display:block;border:0;background:transparent;text-align:left;padding:13px;border-radius:10px;color:var(--muted);font-size:12px;font-weight:bold;margin-bottom:5px}
+.nav.active,.nav:hover{background:#efedff;color:var(--p)}
+main{padding:26px;min-width:0}
+.page{display:none}.page.active{display:block}
+.eyebrow{color:var(--p);font-size:10px;letter-spacing:2px;font-weight:bold}
+.heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}
+h1{font-size:26px;margin:0}h2{font-size:16px;margin:0}h3{font-size:14px}
+.sub{font-size:12px;color:var(--muted);line-height:1.6;margin:10px 0 22px}
+.btn{border:0;border-radius:9px;padding:12px 15px;font-size:12px;font-weight:bold}
+.primary{background:var(--p);color:white}.light{background:#efedff;color:var(--p)}.outline{background:white;border:1px solid var(--line);color:var(--ink)}.danger{background:#ffedf0;color:#c43b55}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.stat,.panel,.task-card{background:white;border:1px solid var(--line);border-radius:14px}
+.stat{padding:16px}.stat small{font-size:11px;color:var(--muted)}.num{font-size:28px;font-weight:900;margin:12px 0 5px}
+.columns{display:grid;grid-template-columns:1.4fr 1fr;gap:15px}
+.panel{margin-bottom:16px;overflow:hidden}
+.panel-head{padding:17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.panel-head p{font-size:11px;color:var(--muted);margin:6px 0 0}
+.task-row{display:flex;align-items:center;gap:12px;padding:14px 17px;border-bottom:1px solid #f0f0f5}
+.task-row:last-child{border-bottom:0}
+.task-icon{width:40px;height:40px;background:#efedff;color:var(--p);display:grid;place-items:center;border-radius:10px;font-size:18px;flex-shrink:0}
+.task-info{flex:1;min-width:0}.task-info strong{font-size:12px;display:block}.task-info small{font-size:10px;color:var(--muted);display:block;margin-top:5px}
+.empty{text-align:center;padding:26px 15px;color:var(--muted);font-size:12px;line-height:1.7}
+.toolbar{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--ink);outline-color:var(--p)}
+.toolbar input{flex:1;min-width:150px}.toolbar select{max-width:180px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.task-card{padding:17px}.task-card p{font-size:12px;color:var(--muted);line-height:1.6}
+.meta{font-size:10px;color:var(--muted);margin:12px 0}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.mini{border:1px solid var(--line);background:white;border-radius:7px;padding:7px 9px;font-size:10px;font-weight:bold}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:480px}
+th,td{padding:13px 12px;border-bottom:1px solid #f0f0f5;text-align:left;font-size:12px}
+th{font-size:10px;color:var(--muted)}
+.status{display:inline-block;background:#fff0d8;color:#9b630d;border-radius:6px;padding:6px 8px;font-size:10px}
+.status.done{background:#dcf8ed;color:#16865e}
+.field{margin:13px 0}.field label{display:block;font-size:11px;font-weight:bold;margin-bottom:7px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-bg{display:none;position:fixed;inset:0;background:#17172d99;z-index:5;padding:15px;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:white;border-radius:16px;padding:22px;width:min(520px,100%);max-height:92vh;overflow:auto}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.close{border:0;background:#f0f0f7;border-radius:8px;width:33px;height:33px;font-size:21px}
+.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#252640;color:white;padding:12px 18px;border-radius:9px;font-size:12px;display:none;z-index:10}
+@media(max-width:850px){.layout{grid-template-columns:155px 1fr}main{padding:18px}.stats{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}}
+@media(max-width:560px){header{padding:14px}.layout{display:block}aside{display:flex;gap:4px;overflow:auto;padding:8px}.nav{width:auto;white-space:nowrap;margin:0;padding:10px;font-size:11px}main{padding:16px 12px}h1{font-size:22px}.cards{grid-template-columns:1fr}.form-row{grid-template-columns:1fr;gap:0}.badge{font-size:10px}.stat{padding:12px}.num{font-size:25px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">DKV<span>CLASS</span><small>CREATIVE CLASSROOM MANAGER</small></div>
+  <div class="badge">✦ Dashboard Guru</div>
+</header>
+
+<div class="layout">
+<aside>
+  <button class="nav active" data-page="dashboard">▦ &nbsp; Dashboard</button>
+  <button class="nav" data-page="tasks">▤ &nbsp; Daftar Tugas</button>
+  <button class="nav" data-page="submissions">◉ &nbsp; Pengumpulan</button>
+  <button class="nav" data-page="students">♙ &nbsp; Data Siswa</button>
+</aside>
+
+<main>
+<section class="page active" id="page-dashboard">
+  <div class="eyebrow">RUANG KERJA KREATIF</div>
+  <div class="heading"><h1>Dashboard Guru 👋</h1><button class="btn primary" onclick="openTask()">＋ Buat Tugas</button></div>
+  <p class="sub">Kelola tugas praktik, data siswa, dan penilaian DKV.</p>
+  <div class="stats">
+    <div class="stat"><small>Total Tugas</small><div class="num" id="countTasks">0</div><small>Tugas terdaftar</small></div>
+    <div class="stat"><small>Total Siswa</small><div class="num" id="countStudents">0</div><small>Siswa terdaftar</small></div>
+    <div class="stat"><small>Perlu Dinilai</small><div class="num" id="countPending">0</div><small>Menunggu review</small></div>
+    <div class="stat"><small>Sudah Dinilai</small><div class="num" id="countGraded">0</div><small>Karya direview</small></div>
+  </div>
+  <div class="columns">
+    <section class="panel">
+      <div class="panel-head"><div><h2>Tugas Terbaru</h2><p>Daftar proyek praktik</p></div><button class="btn light" onclick="go('tasks')">Lihat semua</button></div>
+      <div id="recentTasks"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div><h2>Pengumpulan Terbaru</h2><p>Karya siswa</p></div></div>
+      <div id="recentSubs"></div>
+      <div class="panel-head"><div><h2>Tips DKV ✦</h2><p>Untuk pembelajaran</p></div></div>
+      <div class="empty">Berikan brief yang jelas, target audiens, spesifikasi karya, dan rubrik penilaian untuk membantu siswa menghasilkan desain yang terarah.</div>
+    </section>
+  </div>
+</section>
+
+<section class="page" id="page-tasks">
+  <div class="eyebrow">RUANG KERJA GURU</div>
+  <div class="heading"><h1>Daftar Tugas</h1><button class="btn primary" onclick="openTask()">＋ Buat Tugas</button></div>
+  <p class="sub">Buat dan kelola proyek praktik siswa.</p>
+  <div class="toolbar"><input id="taskSearch" placeholder="Cari tugas..." oninput="renderTasks()"><select id="taskFilter" onchange="renderTasks()"><option value="all">Semua status</option><option value="open">Berjalan</option><option value="done">Selesai</option></select></div>
+  <div class="cards" id="taskCards"></div>
+</section>
+
+<section class="page" id="page-submissions">
+  <div class="eyebrow">KARYA SISWA</div>
+  <div class="heading"><h1>Pengumpulan Karya</h1><button class="btn primary" onclick="openSubmission()">＋ Catat Pengumpulan</button></div>
+  <p class="sub">Catat hasil karya dan berikan nilai serta feedback.</p>
+  <div class="toolbar"><input id="subSearch" placeholder="Cari siswa atau tugas..." oninput="renderSubs()"><select id="subFilter" onchange="renderSubs()"><option value="all">Semua status</option><option value="pending">Perlu dinilai</option><option value="graded">Sudah dinilai</option></select></div>
+  <section class="panel"><div class="table-wrap"><table><thead><tr><th>Nama siswa</th><th>Tugas</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="subRows"></tbody></table></div></section>
+</section>
+
+<section class="page" id="page-students">
+  <div class="eyebrow">DATA KELAS</div>
+  <div class="heading"><h1>Data Siswa</h1><button class="btn primary" onclick="openStudent()">＋ Tambah Siswa</button></div>
+  <p class="sub">Daftar siswa kosong. Silakan masukkan nama siswa sendiri.</p>
+  <div class="toolbar"><input id="studentSearch" placeholder="Cari nama atau kelas..." oninput="renderStudents()"></div>
+  <section class="panel"><div class="table-wrap"><table><thead><tr><th>Nama siswa</th><th>Kelas</th><th>Email</th><th>Pengumpulan</th><th>Aksi</th></tr></thead><tbody id="studentRows"></tbody></table></div></section>
+</section>
+</main>
+</div>
+
+<div class="modal-bg" id="taskModal"><div class="modal">
+  <div class="modal-head"><h2 id="taskModalHeading">Buat Tugas Baru</h2><button class="close" onclick="closeModal('taskModal')">×</button></div>
+  <form id="taskForm">
+    <input type="hidden" id="editTaskId">
+    <div class="field"><label>Judul tugas *</label><input id="taskTitle" required placeholder="Contoh: Desain Poster"></div>
+    <div class="form-row">
+      <div class="field"><label>Mata pelajaran</label><select id="taskSubject"><option>Desain Grafis</option><option>Tipografi</option><option>Fotografi</option><option>Ilustrasi</option><option>Branding</option><option>Video Kreatif</option></select></div>
+      <div class="field"><label>Kelas *</label><input id="taskClass" required placeholder="XI DKV 1"></div>
+    </div>
+    <div class="field"><label>Instruksi tugas *</label><textarea id="taskDescription" required placeholder="Brief, target audiens, ukuran, format karya..."></textarea></div>
+    <div class="form-row">
+      <div class="field"><label>Tenggat *</label><input id="taskDue" type="date" required></div>
+      <div class="field"><label>Jenis karya</label><select id="taskType"><option>Poster</option><option>Logo</option><option>Fotografi</option><option>Ilustrasi</option><option>Video</option><option>Desain Kemasan</option><option>Lainnya</option></select></div>
+    </div>
+    <div class="field"><label>Rubrik penilaian</label><textarea id="taskRubric" placeholder="Komposisi, tipografi, warna, kreativitas..."></textarea></div>
+    <div class="form-actions"><button type="button" class="btn outline" onclick="closeModal('taskModal')">Batal</button><button class="btn primary">Simpan Tugas</button></div>
+  </form>
+</div></div>
+
+<div class="modal-bg" id="studentModal"><div class="modal">
+  <div class="modal-head"><h2>Tambah Siswa</h2><button class="close" onclick="closeModal('studentModal')">×</button></div>
+  <form id="studentForm">
+    <div class="field"><label>Nama lengkap *</label><input id="studentName" required placeholder="Nama siswa"></div>
+    <div class="form-row"><div class="field"><label>Kelas *</label><input id="studentClass" required placeholder="XI DKV 1"></div><div class="field"><label>Email (opsional)</label><input id="studentEmail" type="email" placeholder="siswa@email.com"></div></div>
+    <div class="form-actions"><button type="button" class="btn outline" onclick="closeModal('studentModal')">Batal</button><button class="btn primary">Tambah Siswa</button></div>
+  </form>
+</div></div>
+
+<div class="modal-bg" id="submissionModal"><div class="modal">
+  <div class="modal-head"><h2>Catat Pengumpulan</h2><button class="close" onclick="closeModal('submissionModal')">×</button></div>
+  <form id="submissionForm">
+    <div class="field"><label>Nama siswa *</label><select id="subStudent" required></select></div>
+    <div class="field"><label>Tugas *</label><select id="subTask" required></select></div>
+    <div class="field"><label>Tautan karya (opsional)</label><input id="subLink" type="url" placeholder="https://..."></div>
+    <div class="field"><label>Tanggal pengumpulan *</label><input id="subDate" type="date" required></div>
+    <div class="form-actions"><button type="button" class="btn outline" onclick="closeModal('submissionModal')">Batal</button><button class="btn primary">Simpan</button></div>
+    <p class="sub">Versi ini mencatat tautan karya secara manual. Belum mendukung unggah file online.</p>
+  </form>
+</div></div>
+
+<div class="modal-bg" id="gradeModal"><div class="modal">
+  <div class="modal-head"><h2>Nilai dan Feedback</h2><button class="close" onclick="closeModal('gradeModal')">×</button></div>
+  <form id="gradeForm">
+    <input type="hidden" id="gradeId">
+    <p id="gradeInfo" class="sub"></p>
+    <div class="field"><label>Nilai (0–100) *</label><input id="gradeScore" type="number" min="0" max="100" required></div>
+    <div class="field"><label>Komentar atau revisi *</label><textarea id="gradeFeedback" required placeholder="Masukkan feedback untuk siswa..."></textarea></div>
+    <div class="form-actions"><button type="button" class="btn outline" onclick="closeModal('gradeModal')">Batal</button><button class="btn primary">Simpan Penilaian</button></div>
+  </form>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const KEY='dkv_class_manager_v4';
+const read=k=>{try{return JSON.parse(localStorage.getItem(KEY+'_'+k)||'[]')}catch(e){return []}};
+let tasks=read('tasks'),students=read('students'),subs=read('subs');
+const today=()=>new Date().toISOString().slice(0,10);
+const dateText=d=>d?new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'-';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function save(){localStorage.setItem(KEY+'_tasks',JSON.stringify(tasks));localStorage.setItem(KEY+'_students',JSON.stringify(students));localStorage.setItem(KEY+'_subs',JSON.stringify(subs));renderAll()}
+function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function toast(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)}
+function closeModal(m){$(m).classList.remove('show')}
+function showModal(m){$(m).classList.add('show')}
+function go(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('page-'+p).classList.add('active');document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.page===p));renderAll()}
+document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+function openTask(t=null){
+ $('taskForm').reset();$('editTaskId').value=t?.id||'';
+ $('taskModalHeading').textContent=t?'Edit Tugas':'Buat Tugas Baru';
+ if(t){$('taskTitle').value=t.title;$('taskSubject').value=t.subject;$('taskClass').value=t.klass;$('taskDescription').value=t.description;$('taskDue').value=t.due;$('taskType').value=t.type;$('taskRubric').value=t.rubric||''}
+ showModal('taskModal');
+}
+$('taskForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const old=tasks.find(t=>t.id===$('editTaskId').value);
+ const t={id:old?.id||id(),title:$('taskTitle').value.trim(),subject:$('taskSubject').value,klass:$('taskClass').value.trim(),description:$('taskDescription').value.trim(),due:$('taskDue').value,type:$('taskType').value,rubric:$('taskRubric').value.trim(),done:old?.done||false};
+ if(old)tasks=tasks.map(x=>x.id===old.id?t:x);else tasks.unshift(t);
+ closeModal('taskModal');save();toast(old?'Tugas berhasil diperbarui':'Tugas berhasil dibuat');
+});
+function deleteTask(i){if(!confirm('Hapus tugas ini? Pengumpulan terkait juga akan dihapus.'))return;tasks=tasks.filter(t=>t.id!==i);subs=subs.filter(s=>s.taskId!==i);save();toast('Tugas dihapus')}
+function toggleTask(i){tasks=tasks.map(t=>t.id===i?{...t,done:!t.done}:t);save()}
+function openStudent(){$('studentForm').reset();showModal('studentModal')}
+$('studentForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ students.push({id:id(),name:$('studentName').value.trim(),klass:$('studentClass').value.trim(),email:$('studentEmail').value.trim()});
+ closeModal('studentModal');save();toast('Siswa berhasil ditambahkan');
+});
+function deleteStudent(i){if(!confirm('Hapus siswa ini? Catatan pengumpulan siswa juga akan dihapus.'))return;students=students.filter(s=>s.id!==i);subs=subs.filter(s=>s.studentId!==i);save();toast('Siswa dihapus')}
+function openSubmission(){
+ if(!students.length){toast('Tambahkan data siswa terlebih dahulu');go('students');return}
+ if(!tasks.length){toast('Buat tugas terlebih dahulu');go('tasks');return}
+ $('submissionForm').reset();
+ $('subStudent').innerHTML=students.map(s=>`<option value="${s.id}">${esc(s.name)} — ${esc(s.klass)}</option>`).join('');
+ $('subTask').innerHTML=tasks.map(t=>`<option value="${t.id}">${esc(t.title)}</option>`).join('');
+ $('subDate').value=today();showModal('submissionModal');
+}
+$('submissionForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const studentId=$('subStudent').value,taskId=$('subTask').value;
+ if(subs.some(s=>s.studentId===studentId&&s.taskId===taskId)){toast('Siswa ini sudah tercatat mengumpulkan tugas tersebut');return}
+ subs.unshift({id:id(),studentId,taskId,link:$('subLink').value.trim(),date:$('subDate').value,score:null,feedback:''});
+ closeModal('submissionModal');save();toast('Pengumpulan berhasil dicatat');
+});
+function openGrade(i){
+ const s=subs.find(x=>x.id===i);if(!s)return;
+ const student=students.find(x=>x.id===s.studentId),task=tasks.find(x=>x.id===s.taskId);
+ $('gradeId').value=i;$('gradeInfo').textContent=(student?.name||'Siswa')+' — '+(task?.title||'Tugas');
+ $('gradeScore').value=s.score??'';$('gradeFeedback').value=s.feedback||'';showModal('gradeModal');
+}
+$('gradeForm').addEventListener('submit',e=>{
+ e.preventDefault();const i=$('gradeId').value;
+ subs=subs.map(s=>s.id===i?{...s,score:Number($('gradeScore').value),feedback:$('gradeFeedback').value.trim()}:s);
+ closeModal('gradeModal');save();toast('Penilaian berhasil disimpan');
+});
+function renderDashboard(){
+ $('countTasks').textContent=tasks.length;$('countStudents').textContent=students.length;
+ $('countPending').textContent=subs.filter(s=>s.score===null||s.score===undefined).length;
+ $('countGraded').textContent=subs.filter(s=>s.score!==null&&s.score!==undefined).length;
+ $('recentTasks').innerHTML=tasks.length?tasks.slice(0,5).map(t=>`<div class="task-row"><div class="task-icon">✎</div><div class="task-info"><strong>${esc(t.title)}</strong><small>${esc(t.subject)} · ${esc(t.klass)} · Tenggat ${dateText(t.due)}</small></div><span class="status ${t.done?'done':''}">${t.done?'Selesai':'Berjalan'}</span></div>`).join(''):'<div class="empty">Belum ada tugas.<br>Buat tugas praktik pertamamu.</div>';
+ $('recentSubs').innerHTML=subs.length?subs.slice(0,5).map(s=>{let st=students.find(x=>x.id===s.studentId),t=tasks.find(x=>x.id===s.taskId);return `<div class="task-row"><div class="task-icon">▧</div><div class="task-info"><strong>${esc(st?.name||'Siswa')}</strong><small>${esc(t?.title||'Tugas')} · ${dateText(s.date)}</small></div><span class="status ${s.score!=null?'done':''}">${s.score!=null?'Nilai '+s.score:'Perlu dinilai'}</span></div>`}).join(''):'<div class="empty">Belum ada pengumpulan karya.</div>';
+}
+function renderTasks(){
+ const q=($('taskSearch')?.value||'').toLowerCase(),f=$('taskFilter')?.value||'all';
+ const arr=tasks.filter(t=>(t.title+' '+t.subject+' '+t.klass).toLowerCase().includes(q)&&(f==='all'||(f==='done'?t.done:!t.done)));
+ $('taskCards').innerHTML=arr.length?arr.map(t=>`<article class="task-card"><span class="status ${t.done?'done':''}">${t.done?'Selesai':'Berjalan'}</span><h3>${esc(t.title)}</h3><div class="meta">${esc(t.subject)} · ${esc(t.klass)}<br>Tenggat: ${dateText(t.due)} · ${esc(t.type)}</div><p>${esc(t.description)}</p>${t.rubric?`<p><b>Rubrik:</b> ${esc(t.rubric)}</p>`:''}<div class="actions"><button class="mini" onclick="openTask(tasks.find(x=>x.id==='${t.id}'))">Edit</button><button class="mini" onclick="toggleTask('${t.id}')">${t.done?'Aktifkan':'Tandai selesai'}</button><button class="mini" onclick="deleteTask('${t.id}')">Hapus</button></div></article>`).join(''):'<div class="panel empty">Belum ada tugas yang cocok.<br>Tekan “Buat Tugas” untuk memulai.</div>';
+}
+function renderStudents(){
+ const q=($('studentSearch')?.value||'').toLowerCase();
+ const arr=students.filter(s=>(s.name+' '+s.klass+' '+s.email).toLowerCase().includes(q));
+ $('studentRows').innerHTML=arr.length?arr.map(s=>`<tr><td><b>${esc(s.name)}</b></td><td>${esc(s.klass)}</td><td>${esc(s.email||'-')}</td><td>${subs.filter(x=>x.studentId===s.id).length}</td><td><button class="mini" onclick="deleteStudent('${s.id}')">Hapus</button></td></tr>`).join(''):'<tr><td colspan="5" class="empty">Belum ada siswa. Tambahkan nama siswa sendiri.</td></tr>';
+}
+function renderSubs(){
+ const q=($('subSearch')?.value||'').toLowerCase(),f=$('subFilter')?.value||'all';
+ const arr=subs.filter(s=>{const st=students.find(x=>x.id===s.studentId),t=tasks.find(x=>x.id===s.taskId);const graded=s.score!==null&&s.score!==undefined;return ((st?.name||'')+' '+(t?.title||'')).toLowerCase().includes(q)&&(f==='all'||(f==='graded'?graded:!graded))});
+ $('subRows').innerHTML=arr.length?arr.map(s=>{const st=students.find(x=>x.id===s.studentId),t=tasks.find(x=>x.id===s.taskId),graded=s.score!==null&&s.score!==undefined;return `<tr><td><b>${esc(st?.name||'Siswa')}</b></td><td>${esc(t?.title||'Tugas')}${s.link?`<br><a href="${esc(s.link)}" target="_blank" rel="noopener">Lihat karya ↗</a>`:''}</td><td>${dateText(s.date)}</td><td><span class="status ${graded?'done':''}">${graded?'Nilai '+s.score:'Perlu dinilai'}</span></td><td><button class="mini" onclick="openGrade('${s.id}')">${graded?'Edit nilai':'Nilai'}</button> <button class="mini" onclick="deleteSub('${s.id}')">Hapus</button>${graded?`<p class="notice">${esc(s.feedback)}</p>`:''}</td></tr>`}).join(''):'<tr><td colspan="5" class="empty">Belum ada pengumpulan karya.</td></tr>';
+}
+function deleteSub(i){if(!confirm('Hapus catatan pengumpulan ini?'))return;subs=subs.filter(s=>s.id!==i);save();toast('Pengumpulan dihapus')}
+function renderAll(){renderDashboard();renderTasks();renderStudents();renderSubs()}
+renderAll();
+</script>
+</body>
+</html>
