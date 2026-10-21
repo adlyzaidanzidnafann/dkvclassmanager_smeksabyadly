@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — DKV CLASS</title>
+  <link rel="stylesheet" href="css/style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js" defer></script>
+  <script src="js/auth.js" defer></script>
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <div class="brand-mark">D</div>
+    <p class="eyebrow">RUANG KELAS DIGITAL</p>
+    <h1>DKV CLASS</h1>
+    <p class="muted">Masuk untuk melanjutkan ke kelasmu.</p>
+
+    <form id="login-form">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="username"
+        placeholder="nama@email.com"
+        required
+      >
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Masukkan password"
+        required
+      >
+
+      <button type="submit" class="primary-btn">Masuk</button>
+      <p id="login-message" class="message" role="status"></p>
+    </form>
+
+    <p class="footer-credit">Buatan Adly</p>
+  </main>
+</body>
+</html>
